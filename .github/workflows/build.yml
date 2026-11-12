@@ -1,0 +1,40 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Unzip project
+        run: |
+          unzip BoyKisserWallpaper.zip
+          ls -la # Покажет, распаковалось ли
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Grant execute permission for gradlew
+        run: |
+          cd BoyKisserWallpaper
+          chmod +x gradlew
+
+      - name: Build with Gradle
+        run: |
+          cd BoyKisserWallpaper
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Live-Wallpaper-APK
+          path: BoyKisserWallpaper/app/build/outputs/apk/debug/app-debug.apk
