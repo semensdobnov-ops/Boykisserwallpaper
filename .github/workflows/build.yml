@@ -12,17 +12,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Unzip and check files
+      - name: Unzip
         run: |
-          unzip BoyKisserWallpaper.zip -d project
-          cd project
-          echo "--- ЧТО ВНУТРИ ПАПКИ PROJECT ---"
-          ls -la
-          
-          # Ищем папку, где лежит gradlew
-          if [ -f "gradlew" ]; then echo "Нашел gradlew в корне"; 
-          elif [ -f "*/gradlew" ]; then echo "Нашел gradlew в подпапке"; cd */; 
-          else echo "ОШИБКА: gradlew не найден!"; exit 1; fi
+          unzip -o BoyKisserWallpaper.zip -d project
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -30,15 +22,16 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
       - name: Build with Gradle
         run: |
-          cd project
-          if [ -d "*/" ]; then cd */; fi
-          chmod +x gradlew
-          ./gradlew assembleDebug
+          cd project/BoyKisserWallpaper
+          gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: BoyKisser-Wallpaper-APK
-          path: project/**/app/build/outputs/apk/debug/*.apk
+          name: BoyKisser-APK
+          path: project/BoyKisserWallpaper/app/build/outputs/apk/debug/*.apk
